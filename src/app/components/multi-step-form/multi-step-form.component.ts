@@ -78,7 +78,7 @@ import { WorkingSkill } from '../../models/registration.model';
                       <label for="alternateMobile">Alternate Mobile Number</label>
                       <input
                         id="alternateMobile"
-                        type="tel"
+                        type="number"
                         formControlName="alternateMobile"
                         placeholder="Optional">
                     </div>
@@ -258,5 +258,6 @@ export class MultiStepFormComponent {
     // Complete registration and navigate to confirmation
     console.log('Registration completed:', this.registrationService.getCurrentData());
     this.router.navigate(['/confirmation']);
+     window.alert('✅ Your All Information Is Valid . Your Account Create Successful Thank You !');
   }
 }

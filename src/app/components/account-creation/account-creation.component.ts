@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { RegistrationService } from '../../services/registration.service';
 import { SidebarComponent } from '../sidebar/sidebar.component';
@@ -7,26 +7,23 @@ import { UserRegistration } from '../../models/registration.model';
 
 @Component({
   selector: 'app-account-creation',
+  standalone: true,
+  imports: [ReactiveFormsModule, SidebarComponent],
   template: `
     <div class="page-container">
       <div class="container">
         <div class="content-grid">
-          <!-- Main Content -->
           <div class="main-content">
             <div class="form-card">
               <h2 class="form-title">Create Your Account</h2>
-              
+
               <form [formGroup]="accountForm" (ngSubmit)="onSubmit()">
                 <div class="form-content">
-                  <!-- Name -->
+                  
+                  <!-- Full Name -->
                   <div class="form-group">
-                    <label for="name">Full Name</label>
-                    <input
-                      id="name"
-                      type="text"
-                      formControlName="name"
-                      placeholder="Enter your full name"
-                      class="form-input">
+                    <label>Full Name</label>
+                    <input type="text" formControlName="name" placeholder="Enter your full name" class="form-input" />
                     @if (accountForm.get('name')?.invalid && accountForm.get('name')?.touched) {
                       <div class="error">Name is required</div>
                     }
@@ -34,54 +31,57 @@ import { UserRegistration } from '../../models/registration.model';
 
                   <!-- Gender -->
                   <div class="form-group">
-                    <label class="form-label">Gender</label>
+                    <label>Gender</label>
                     <div class="gender-options">
                       @for (gender of genders; track gender.value) {
                         <label class="radio-option">
-                          <input
-                            type="radio"
-                            formControlName="gender"
-                            [value]="gender.value"
-                            class="radio-input">
-                          <span class="radio-text">{{ gender.label }}</span>
+                          <input type="radio" formControlName="gender" [value]="gender.value" class="radio-input" />
+                          <span>{{ gender.label }}</span>
                         </label>
                       }
                     </div>
                   </div>
 
-                  <!-- Email/Mobile Toggle -->
+                  <!-- Email or Mobile -->
                   <div class="form-group">
-                    <label class="form-label">Contact Method</label>
+                    <label>Contact Method</label>
                     <div class="toggle-buttons">
                       <button
                         type="button"
                         (click)="toggleContactMethod('email')"
                         [class.active]="contactMethod() === 'email'"
-                        class="toggle-btn">
+                        class="toggle-btn"
+                      >
                         Email
                       </button>
                       <button
                         type="button"
                         (click)="toggleContactMethod('mobile')"
                         [class.active]="contactMethod() === 'mobile'"
-                        class="toggle-btn">
+                        class="toggle-btn"
+                      >
                         Mobile
                       </button>
                     </div>
 
                     @if (contactMethod() === 'mobile') {
                       <div class="mobile-input-group">
-                        <select formControlName="countryCode" class="country-select">
-                          <option value="+88">+88</option>
-                          <option value="+1">+1</option>
-                          <option value="+91">+91</option>
+                        <select formControlName="countryCode" (change)="onCountryChange()" class="country-select">
+                          <option value="+88">+88 (BD)</option>
+                          <option value="+1">+1 (USA)</option>
+                          <option value="+91">+91 (India)</option>
                         </select>
                         <input
-                          type="tel"
+                          type="number"
                           formControlName="mobile"
                           placeholder="Enter your mobile number"
-                          class="form-input mobile-input">
+                          class="form-input mobile-input"
+                        />
                       </div>
+
+                      @if (accountForm.get('mobile')?.errors?.['invalidLength'] && accountForm.get('mobile')?.touched) {
+                        <div class="error">Invalid number length for selected country</div>
+                      }
                     }
 
                     @if (contactMethod() === 'email') {
@@ -89,19 +89,18 @@ import { UserRegistration } from '../../models/registration.model';
                         type="email"
                         formControlName="email"
                         placeholder="Enter your email address"
-                        class="form-input">
+                        class="form-input"
+                      />
+                      @if (accountForm.get('email')?.invalid && accountForm.get('email')?.touched) {
+                        <div class="error">Enter a valid email address</div>
+                      }
                     }
                   </div>
 
                   <!-- Password -->
                   <div class="form-group">
-                    <label for="password">Password</label>
-                    <input
-                      id="password"
-                      type="password"
-                      formControlName="password"
-                      placeholder="Create a password"
-                      class="form-input">
+                    <label>Password</label>
+                    <input type="password" formControlName="password" placeholder="Enter your password" class="form-input" />
                     @if (accountForm.get('password')?.invalid && accountForm.get('password')?.touched) {
                       <div class="error">Password must be at least 6 characters</div>
                     }
@@ -109,35 +108,45 @@ import { UserRegistration } from '../../models/registration.model';
 
                   <!-- Age -->
                   <div class="form-group">
-                    <label for="age">Age</label>
-                    <input
-                      id="age"
-                      type="number"
-                      formControlName="age"
-                      placeholder="Enter your age"
-                      class="form-input">
+                    <label>Age</label>
+                    <input type="number" formControlName="age" placeholder="Enter your age" class="form-input" />
                     @if (accountForm.get('age')?.invalid && accountForm.get('age')?.touched) {
                       <div class="error">Please enter a valid age (minimum 18)</div>
+                    }
+                  </div>
+
+                  <!-- Are You Human -->
+                  <div class="form-group human-section">
+                    <label>Are you human?</label>
+                    <div class="human-box">
+                      <span>{{ num1 }} + {{ num2 }} =</span>
+                      <input
+                        type="number"
+                        formControlName="humanAnswer"
+                        placeholder="?"
+                        class="form-input small-input"
+                      />
+                      <button type="button" (click)="generateQuestion()" class="refresh-btn">↻</button>
+                    </div>
+                    @if (accountForm.get('humanAnswer')?.invalid && accountForm.get('humanAnswer')?.touched) {
+                      <div class="error">Incorrect answer. Try again!</div>
                     }
                   </div>
 
                   <!-- Checkboxes -->
                   <div class="checkbox-group">
                     <label class="checkbox-option">
-                      <input type="checkbox" formControlName="acceptTerms" class="checkbox-input">
-                      <span class="checkbox-text">I accept the Terms & Conditions</span>
+                      <input type="checkbox" formControlName="acceptTerms" class="checkbox-input" />
+                      <span>I accept the Terms & Conditions</span>
                     </label>
                     <label class="checkbox-option">
-                      <input type="checkbox" formControlName="jobNotifications" class="checkbox-input">
-                      <span class="checkbox-text">Send me job notifications and updates</span>
+                      <input type="checkbox" formControlName="jobNotifications" class="checkbox-input" />
+                      <span>Receive job notifications</span>
                     </label>
                   </div>
 
-                  <!-- Submit Button -->
-                  <button
-                    type="submit"
-                    [disabled]="!accountForm.valid"
-                    class="submit-btn btn btn-primary btn-full">
+                  <!-- Submit -->
+                  <button type="submit" [disabled]="!accountForm.valid" class="submit-btn btn btn-primary btn-full">
                     Create Account
                   </button>
                 </div>
@@ -145,7 +154,6 @@ import { UserRegistration } from '../../models/registration.model';
             </div>
           </div>
 
-          <!-- Sidebar -->
           <div class="sidebar-content">
             <app-sidebar />
           </div>
@@ -154,257 +162,210 @@ import { UserRegistration } from '../../models/registration.model';
     </div>
   `,
   styles: [`
-    .page-container {
-      min-height: 100vh;
-      background-color: #f9fafb;
-      padding: 2rem 0;
-    }
+  /* Page container */
+  .page-container {
+    min-height: 100vh;
+    background-color: #f9fafb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+  }
 
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 1rem;
-    }
+  /* Main container */
+  .container {
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 1.5rem;
+  }
 
+  /* Grid layout */
+  .content-grid {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    gap: 2rem;
+  }
+  @media (max-width: 992px) {
     .content-grid {
-      display: grid;
       grid-template-columns: 1fr;
-      gap: 2rem;
     }
+  }
 
-    @media (min-width: 1024px) {
-      .content-grid {
-        grid-template-columns: 3fr 1fr;
-      }
-    }
+  /* Form card */
+  .form-card {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    padding: 2rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  }
 
-    .form-card {
-      background-color: white;
-      border-radius: 0.5rem;
-      border: 1px solid #e5e7eb;
-      padding: 2rem;
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    }
+  .form-title {
+    text-align: center;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: #111827;
+  }
 
-    .form-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #111827;
-      margin-bottom: 1.5rem;
-      text-align: center;
-    }
+  /* Form inputs */
+  .form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-size: 1rem;
+  }
+  .form-input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    outline: none;
+  }
 
-    .form-content {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
+  .error {
+    font-size: 0.85rem;
+    color: #ef4444;
+    margin-top: 0.25rem;
+  }
 
-    .form-group {
-      margin-bottom: 0;
-    }
+  /* Toggle buttons for email/mobile */
+  .toggle-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  .toggle-btn {
+    flex: 1;
+    padding: 0.5rem 0;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    background: #f3f4f6;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  .toggle-btn.active {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+  }
 
-    .form-label {
-      display: block;
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: #374151;
-      margin-bottom: 0.5rem;
-    }
+  /* Mobile input group */
+.mobile-input-group {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
 
-    .form-input {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid #d1d5db;
-      border-radius: 0.5rem;
-      font-size: 1rem;
-      transition: all 0.2s;
-      background-color: white;
-    }
+.country-select {
+  width: 100px; /* fixed width for country code */
+  padding: 0.65rem 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  font-size: 1rem;
+  background: #fff;
+}
 
-    .form-input:focus {
-      outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
+.mobile-input {
+  flex: 1; /* take remaining space */
+  padding: 0.65rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  font-size: 1rem;
+}
 
-    .gender-options {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.75rem;
-    }
+  /* Gender options */
+  .gender-options {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+  .radio-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .radio-input {
+    accent-color: #2563eb;
+  }
 
-    .radio-option {
-      display: flex;
-      align-items: center;
-      padding: 0.75rem;
-      border: 1px solid #d1d5db;
-      border-radius: 0.375rem;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
+  /* Human verification */
+  .human-box {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+  .small-input {
+    width: 70px;
+    text-align: center;
+  }
+  .refresh-btn {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .refresh-btn:hover {
+    background: #1d4ed8;
+  }
 
-    .radio-option:hover {
-      border-color: #9ca3af;
-    }
+  /* Checkboxes */
+  .checkbox-group {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .checkbox-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    color: #111827;
+  }
+  .checkbox-input {
+    accent-color: #2563eb;
+  }
 
-    .radio-input {
-      margin-right: 0.5rem;
-    }
-
-    .radio-text {
-      font-size: 0.875rem;
-      color: #374151;
-    }
-
-    .toggle-buttons {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-
-    .toggle-btn {
-      padding: 0.5rem 1rem;
-      border: 1px solid #d1d5db;
-      border-radius: 0.375rem;
-      background-color: white;
-      color: #374151;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-size: 0.875rem;
-    }
-
-    .toggle-btn.active {
-      background-color: #2563eb;
-      color: white;
-      border-color: #2563eb;
-    }
-
-    .toggle-btn:hover:not(.active) {
-      border-color: #9ca3af;
-    }
-
-    .mobile-input-group {
-      display: flex;
-      gap: 0.75rem;
-    }
-
-    .country-select {
-      width: 6rem;
-      flex-shrink: 0;
-      padding: 0.75rem;
-      border: 1px solid #d1d5db;
-      border-radius: 0.5rem;
-      background-color: white;
-    }
-
-    .mobile-input {
-      flex: 1;
-    }
-
-    .checkbox-group {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .checkbox-option {
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-    }
-
-    .checkbox-input {
-      margin-right: 0.75rem;
-    }
-
-    .checkbox-text {
-      font-size: 0.875rem;
-      color: #374151;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.75rem 1.5rem;
-      font-weight: 500;
-      border-radius: 0.5rem;
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s ease-in-out;
-      text-decoration: none;
-      font-size: 0.875rem;
-    }
-
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .btn-primary {
-      background-color: #2563eb;
-      color: white;
-    }
-
-    .btn-primary:hover:not(:disabled) {
-      background-color: #1d4ed8;
-    }
-
-    .btn-full {
-      width: 100%;
-    }
-
-    .submit-btn {
-      margin-top: 1rem;
-      padding: 0.875rem;
-      font-size: 1rem;
-      font-weight: 600;
-    }
-
-    .error {
-      color: #ef4444;
-      font-size: 0.875rem;
-      margin-top: 0.25rem;
-    }
-
-    @media (max-width: 768px) {
-      .page-container {
-        padding: 1rem 0;
-      }
-      
-      .form-card {
-        padding: 1.5rem;
-      }
-      
-      .gender-options {
-        grid-template-columns: 1fr;
-      }
-      
-      .mobile-input-group {
-        flex-direction: column;
-      }
-      
-      .country-select {
-        width: 100%;
-      }
-    }
-  `],
-  standalone: true,
-  imports: [ReactiveFormsModule, SidebarComponent]
+  /* Submit button */
+  .submit-btn {
+    margin-top: 1.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    border: none;
+    width: 100%;
+  }
+  .btn-primary {
+    background: #2563eb;
+    color: white;
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: #1d4ed8;
+  }
+`]
 })
 export class AccountCreationComponent {
   private fb = inject(FormBuilder);
   private registrationService = inject(RegistrationService);
   private router = inject(Router);
 
-  // Properties that were missing
   contactMethod = signal<'email' | 'mobile'>('email');
-  
+  num1 = 0;
+  num2 = 0;
+  correctAnswer = 0;
+
   genders = [
     { value: 'male', label: 'Male' },
     { value: 'female', label: 'Female' },
-    { value: 'others', label: 'Others' }
+    { value: 'others', label: 'Others' },
   ];
 
   accountForm = this.fb.group({
@@ -416,26 +377,72 @@ export class AccountCreationComponent {
     password: ['', [Validators.required, Validators.minLength(6)]],
     age: ['', [Validators.required, Validators.min(18)]],
     acceptTerms: [false, Validators.requiredTrue],
-    jobNotifications: [true]
+    jobNotifications: [true],
+    humanAnswer: ['', Validators.required],
   });
 
-  // Methods that were missing
+  constructor() {
+    this.generateQuestion();
+  }
+
+  generateQuestion() {
+    this.num1 = Math.floor(Math.random() * 10) + 1;
+    this.num2 = Math.floor(Math.random() * 10) + 1;
+    this.correctAnswer = this.num1 + this.num2;
+    this.accountForm.get('humanAnswer')?.reset('');
+  }
+
   toggleContactMethod(method: 'email' | 'mobile') {
     this.contactMethod.set(method);
     if (method === 'email') {
       this.accountForm.get('email')?.setValidators([Validators.required, Validators.email]);
       this.accountForm.get('mobile')?.clearValidators();
     } else {
-      this.accountForm.get('mobile')?.setValidators([Validators.required]);
+      this.accountForm.get('mobile')?.setValidators([Validators.required, this.mobileValidator.bind(this)]);
       this.accountForm.get('email')?.clearValidators();
     }
     this.accountForm.get('email')?.updateValueAndValidity();
     this.accountForm.get('mobile')?.updateValueAndValidity();
   }
 
+  onCountryChange() {
+    if (this.contactMethod() === 'mobile') {
+      this.accountForm.get('mobile')?.updateValueAndValidity();
+    }
+  }
+
+  mobileValidator(control: AbstractControl) {
+  const countryCode = this.accountForm.get('countryCode')?.value || '+88'; 
+  const value = control.value?.toString() || '';
+  if (!value) return null;
+
+  const lengthRules: Record<string, number> = {
+    '+88': 11,
+    '+1': 10,
+    '+91': 10,
+  };
+
+  // type assertion to fix TS2538
+  const expectedLength = lengthRules[countryCode as keyof typeof lengthRules];
+
+  if (expectedLength && value.length !== expectedLength) {
+    return { invalidLength: true };
+  }
+
+  return null;
+}
+
+
   onSubmit() {
+    const humanAnswer = Number(this.accountForm.get('humanAnswer')?.value);
+    if (humanAnswer !== this.correctAnswer) {
+      this.accountForm.get('humanAnswer')?.setErrors({ incorrect: true });
+      return;
+    }
+
     if (this.accountForm.valid) {
       this.registrationService.updateRegistrationData(this.accountForm.value as Partial<UserRegistration>);
+      alert('✅ All Your Information Will Be Kepts Safe With Us!');
       this.router.navigate(['/verification']);
     }
   }

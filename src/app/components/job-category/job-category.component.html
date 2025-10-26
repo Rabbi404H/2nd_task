@@ -1,0 +1,109 @@
+<div class="job-category-page">
+  <div class="container">
+    <div class="page-header">
+      <h1 class="page-title">Choose Your Career Path</h1>
+      <p class="page-subtitle">Select the category that best describes your profession</p>
+    </div>
+
+    <div class="content-grid">
+      <!-- Main Content -->
+      <div class="main-content">
+        <div class="categories-grid">
+          <ng-container *ngFor="let category of jobCategories; trackBy: trackById">
+            <div class="category-card">
+              <div class="card-content">
+                <h3 class="card-title">{{ category.title }}</h3>
+                <p class="card-description">{{ category.description }}</p>
+
+                <div class="card-actions">
+                  <button (click)="selectCategory(category)" class="btn btn-primary btn-full">
+                    Create Account
+                  </button>
+
+                  <button class="btn btn-secondary btn-full">
+                    View Tutorial
+                  </button>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+
+        <!-- Login CTA -->
+        <div class="login-cta">
+          <button class="login-btn" (click)="openLogin()">
+            Login
+            <span class="btn-glow"></span>
+          </button>
+          <p class="small-note">Already have an account?</p>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="sidebar-content">
+        <app-sidebar />
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGIN MODAL -->
+  <div class="modal-backdrop" *ngIf="showLoginModal">
+    <div class="modal-card">
+      <button class="modal-close" (click)="closeLogin()">✕</button>
+      <h2 class="modal-title">Login to your account</h2>
+
+      <form (ngSubmit)="login()" class="login-form">
+        <label>Email</label>
+        <input [(ngModel)]="loginEmail" name="email" required type="email" placeholder="you@example.com" />
+
+        <label>Password</label>
+        <input [(ngModel)]="loginPassword" name="password" required type="password" placeholder="••••••••" />
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="logging">{{ logging ? 'Signing in...' : 'Sign In' }}</button>
+          <button type="button" class="btn btn-link" (click)="openForgotPassword()">Forgot password?</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- FORGOT PASSWORD MODAL -->
+  <div class="modal-backdrop" *ngIf="showForgotModal">
+    <div class="modal-card">
+      <button class="modal-close" (click)="closeForgotModal()">✕</button>
+
+      <h2 class="modal-title">Forgot Password</h2>
+
+      <form (ngSubmit)="submitForgotStep()" class="login-form">
+        <ng-container [ngSwitch]="forgotStep">
+          <!-- Step 1 -->
+          <div *ngSwitchCase="1">
+            <label>Enter your email</label>
+            <input [(ngModel)]="forgotEmail" name="forgotEmail" type="email" required placeholder="you@example.com" />
+          </div>
+
+          <!-- Step 2 -->
+          <div *ngSwitchCase="2">
+            <label>Enter verification code</label>
+            <input [(ngModel)]="enteredCode" name="enteredCode" type="text" required placeholder="Enter code" />
+          </div>
+
+          <!-- Step 3 -->
+          <div *ngSwitchCase="3">
+            <label>Enter new password</label>
+            <input [(ngModel)]="newPassword" name="newPassword" type="password" required placeholder="New password" />
+          </div>
+        </ng-container>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Next</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" *ngIf="toastMessage" [class.error]="toastType === 'error'">
+    {{ toastMessage }}
+  </div>
+</div>

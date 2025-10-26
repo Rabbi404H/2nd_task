@@ -110,8 +110,9 @@ export class EmailVerificationComponent {
   });
 
   onSubmit() {
-    if (this.verificationForm.valid) {
-      this.router.navigate(['/multi-step']);
-    }
+  if (this.verificationForm.valid) {
+    alert('✅Your Email Verification Was uccessful!');
+    this.router.navigate(['/multi-step']);
   }
+}
 }

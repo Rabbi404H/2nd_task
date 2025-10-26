@@ -9,7 +9,7 @@ export interface UserRegistration {
   name: string;
   gender: string;
   email?: string;
-  mobile?: string;
+  mobile?:string;
   countryCode: string;
   password: string;
   age: number;
@@ -39,7 +39,7 @@ export interface InfoBox {
 export interface CompleteRegistration {
   jobCategory?: JobCategory;
   userInfo?: UserRegistration;
-  address?: Address;
+  address?: Address, string: any ;
   skills?: WorkingSkill[];
   registrationDate?: Date;
 }
@@ -47,9 +47,16 @@ export interface CompleteRegistration {
 export interface SampleUser {
   id: number;
   name: string;
+  email: string;
+  password?: string;
   profession: string;
   location: string;
   skills: string[];
   joinDate: string;
   avatar?: string;
 }
+
+
+
+
+

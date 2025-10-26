@@ -5,7 +5,7 @@ import {
   Address, 
   WorkingSkill, 
   CompleteRegistration, 
-  SampleUser 
+  SampleUser ,
 } from '../models/registration.model';
 
 @Injectable({
@@ -55,10 +55,15 @@ export class RegistrationService {
     { id: 6, name: 'Data Entry', selected: false }
   ];
 
+
+
+
+  // ✅ All Job Categories
   getJobCategories(): JobCategory[] {
     return this.jobCategories;
   }
 
+  // ✅ Districts & Thanas
   getDistricts(): string[] {
     return this.districts;
   }
@@ -67,10 +72,12 @@ export class RegistrationService {
     return this.thanas[district] || [];
   }
 
+  // ✅ Skills
   getSkills(): WorkingSkill[] {
     return [...this.skills];
   }
 
+  // ✅ Registration Data Handling
   updateRegistrationData(data: Partial<UserRegistration | Address | { skills: WorkingSkill[] }>) {
     this.registrationData.update(current => ({ ...current, ...data }));
   }
@@ -83,56 +90,32 @@ export class RegistrationService {
     this.registrationData.set({});
   }
 
-  // === তোমার নতুন যুক্ত অংশ ===
-
   getCompleteRegistrationData(): CompleteRegistration {
     return this.registrationData() as CompleteRegistration;
   }
 
+  // ✅ Sample Users (for Login System)
   getSampleUsers(): SampleUser[] {
     return [
-      {
-        id: 1,
-        name: 'Abdul Karim',
-        profession: 'Software Engineer',
-        location: 'Dhaka, Bangladesh',
-        skills: ['JavaScript', 'Angular', 'Node.js'],
-        joinDate: '2 months ago',
-        avatar: '👨‍💻'
-      },
-      {
-        id: 2,
-        name: 'Fatima Begum',
-        profession: 'Graphic Designer',
-        location: 'Chattogram, Bangladesh',
-        skills: ['UI/UX Design', 'Adobe Photoshop', 'Figma'],
-        joinDate: '1 month ago',
-        avatar: '👩‍🎨'
-      },
-      {
-        id: 3,
-        name: 'Rahim Ahmed',
-        profession: 'Digital Marketer',
-        location: 'Sylhet, Bangladesh',
-        skills: ['SEO', 'Social Media', 'Content Marketing'],
-        joinDate: '3 weeks ago',
-        avatar: '👨‍💼'
-      },
-      {
-        id: 4,
-        name: 'Ayesha Khan',
-        profession: 'Data Analyst',
-        location: 'Rajshahi, Bangladesh',
-        skills: ['Python', 'SQL', 'Data Visualization'],
-        joinDate: '2 weeks ago',
-        avatar: '👩‍🔬'
-      }
+       { id: 1, name: 'Abdul Karim', email: 'kdrabbihossain056@gmail.com', password: 'password1', profession: 'Software Engineer', location: 'Dhaka', skills: ['JavaScript','Angular'], joinDate: '2 months ago', avatar: '👨‍💻' },
+      { id: 2, name: 'Abdul Karim', email: 'abdul.k@example.com', password: 'password1', profession: 'Software Engineer', location: 'Dhaka', skills: ['JavaScript','Angular'], joinDate: '2 months ago', avatar: '👨‍💻' },
+      { id: 3, name: 'Fatima Begum', email: 'fatima@example.com', password: 'password2', profession: 'Graphic Designer', location: 'Chattogram', skills: ['Figma','Photoshop'], joinDate: '1 month ago', avatar: '👩‍🎨' },
+      { id: 4, name: 'Rahim Ahmed', email: 'rahim@example.com', password: 'password3', profession: 'Digital Marketer', location: 'Sylhet', skills: ['SEO'], joinDate: '3 weeks ago', avatar: '👨‍💼' },
+      { id: 5, name: 'Ayesha Khan', email: 'ayesha@example.com', password: 'password4', profession: 'Data Analyst', location: 'Rajshahi', skills: ['Python','SQL'], joinDate: '2 weeks ago', avatar: '👩‍🔬' },
+      { id: 6, name: 'Hasan Mahmud', email: 'hasan@example.com', password: 'password5', profession: 'Electrician', location: 'Khulna', skills: ['Wiring','Maintenance'], joinDate: '1 week ago', avatar: '🧰' },
+      { id: 7, name: 'Rina Akter', email: 'rina@example.com', password: 'password6', profession: 'Teacher', location: 'Mymensingh', skills: ['English','Math'], joinDate: '5 days ago', avatar: '👩‍🏫' },
+      { id: 8, name: 'Tanvir Islam', email: 'tanvir@example.com', password: 'password7', profession: 'Driver', location: 'Barishal', skills: ['Driving','Mechanics'], joinDate: '1 month ago', avatar: '🚗' },
+      { id: 9, name: 'Nasrin Jahan', email: 'nasrin@example.com', password: 'password8', profession: 'Nurse', location: 'Rangpur', skills: ['Patient Care'], joinDate: '3 weeks ago', avatar: '👩‍⚕️' },
+      { id: 10, name: 'Sabbir Hossain', email: 'sabbir@example.com', password: 'password9', profession: 'Technician', location: 'Chattogram', skills: ['Electronics','Repair'], joinDate: '2 months ago', avatar: '🔧' },
+      { id: 11, name: 'Mitu Rahman', email: 'mitu@example.com', password: 'password10', profession: 'Web Designer', location: 'Dhaka', skills: ['HTML','CSS','UI Design'], joinDate: '1 week ago', avatar: '👩‍💻' },
     ];
   }
 
+ 
+
+  // ✅ Registration Completion
   completeRegistration() {
     const current = this.registrationData();
-    // Normalize address so it always matches the Address type expected by CompleteRegistration
     const rawAddress = (current as any).address;
     const addressObj: Address = rawAddress && typeof rawAddress === 'object'
       ? (rawAddress as Address)
@@ -143,7 +126,6 @@ export class RegistrationService {
       address: addressObj,
       registrationDate: new Date()
     };
-    // Here you can send data to backend or store in database
     console.log('Registration Completed:', completeData);
     return completeData;
   }
