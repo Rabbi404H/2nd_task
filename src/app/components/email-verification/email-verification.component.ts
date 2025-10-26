@@ -111,7 +111,7 @@ export class EmailVerificationComponent {
 
   onSubmit() {
   if (this.verificationForm.valid) {
-    alert('✅Your Email Verification Was uccessful!');
+    alert('✅Your Email Verification Was Successful!');
     this.router.navigate(['/multi-step']);
   }
 }
