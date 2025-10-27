@@ -4,6 +4,8 @@ import { AccountCreationComponent } from './components/account-creation/account-
 import { EmailVerificationComponent } from './components/email-verification/email-verification.component';
 import { MultiStepFormComponent } from './components/multi-step-form/multi-step-form.component';
 import { ConfirmationComponent } from './components/confirmation/confirmation.component';
+import { PurchaseOrderComponent } from './components/purchase/purchase-order.component';
+import { PurchaseConfirmationComponent } from './components/purchase-confirmation/purchase-confirmation.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/category', pathMatch: 'full' },
@@ -11,6 +13,10 @@ export const routes: Routes = [
   { path: 'account', component: AccountCreationComponent },
   { path: 'verification', component: EmailVerificationComponent },
   { path: 'multi-step', component: MultiStepFormComponent },
-  { path: 'confirmation', component: ConfirmationComponent }, // New route
+  { path: 'confirmation', component: ConfirmationComponent },
+   { path: 'purchase-order', component: PurchaseOrderComponent },
+  { path: 'purchase-confirmation', component: PurchaseConfirmationComponent },
+    { path: 'purchase-order', component: PurchaseOrderComponent },
+  { path: 'purchase-order', component: PurchaseOrderComponent },
   { path: '**', redirectTo: '/category' }
 ];

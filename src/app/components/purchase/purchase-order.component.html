@@ -1,0 +1,132 @@
+<div class="purchase-order-container">
+  <div class="purchase-order-form">
+    <!-- Header -->
+    <div class="header-section">
+      <h1>Purchase Order Form</h1>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Left Side -->
+      <div class="left-section">
+        <div class="form-group">
+          <label>P.O. No</label>
+          <div class="value">{{purchaseData.poNumber}}</div>
+        </div>
+
+        <div class="form-group">
+          <label>Supplier Name</label>
+          <input type="text" [(ngModel)]="purchaseData.supplierName" class="form-input" placeholder="Enter supplier name">
+        </div>
+
+        <div class="form-group">
+          <label>Supplier Address</label>
+          <textarea [(ngModel)]="purchaseData.supplierAddress" class="form-textarea" rows="3" placeholder="Enter supplier address"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="number" [(ngModel)]="purchaseData.phoneNumber" class="form-input" placeholder="Enter phone number">
+        </div>
+
+        <div class="form-group">
+          <label>Supplier Contact</label>
+          <input type="text" [(ngModel)]="purchaseData.supplierContact" class="form-input" placeholder="Enter supplier contact details">
+        </div>
+
+        <div class="form-group">
+          <label>Subject</label>
+          <select [(ngModel)]="purchaseData.subject" class="form-select">
+            <option *ngFor="let option of subjectOptions" [value]="option.value">
+              {{option.label}}
+            </option>
+          </select>
+        </div>
+
+        <div class="letter-content">
+          <p><strong>Dear Sir,</strong></p>
+          <p>Requests you to arrange supply of following materials from your organization.</p>
+        </div>
+      </div>
+
+      <!-- Right Side -->
+      <div class="right-section">
+        <div class="form-group">
+          <label>P.O. Date</label>
+          <div class="value">{{purchaseData.poDate}}</div>
+        </div>
+
+        <div class="form-group">
+          <label>Project Name</label>
+          <input type="text" [(ngModel)]="purchaseData.projectName" class="form-input" placeholder="Enter project name">
+        </div>
+
+        <div class="form-group">
+          <label>Project Address</label>
+          <textarea [(ngModel)]="purchaseData.projectAddress" class="form-textarea" rows="3" placeholder="Enter project address"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Contact Person</label>
+          <input type="text-number" [(ngModel)]="purchaseData.contactPerson" class="form-input" placeholder="Enter contact person details">
+        </div>
+      </div>
+    </div>
+
+    <!-- Items Table -->
+    <div class="items-section">
+      <table class="items-table">
+        <thead>
+          <tr>
+            <th width="5%">SL No</th>
+            <th width="45%">Description of Items</th>
+            <th width="10%">Quantity</th>
+            <th width="10%">Unit</th>
+            <th width="15%">Rate (BDT)</th>
+            <th width="15%">Amount (BDT)</th>
+            <th width="5%">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of purchaseData.items; let i = index">
+            <td>{{item.slNo}}</td>
+            <td>
+              <input type="text" [(ngModel)]="item.description" class="table-input" placeholder="Item description">
+            </td>
+            <td>
+              <input type="number" [(ngModel)]="item.quantity" (change)="calculateAmount(item)" class="table-input" placeholder="0" min="0">
+            </td>
+            <td>
+              <input type="text" [(ngModel)]="item.unit" class="table-input" placeholder="Unit">
+            </td>
+            <td>
+              <input type="number" [(ngModel)]="item.rate" (change)="calculateAmount(item)" class="table-input" placeholder="0.00" min="0" step="0.01">
+            </td>
+            <td>
+              <input type="number" [value]="item.amount" readonly class="table-input readonly">
+            </td>
+            <td>
+              <button *ngIf="purchaseData.items.length > 1" (click)="removeItem(i)" class="btn-remove">×</button>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="5" style="text-align: right; font-weight: bold;">Total Amount:</td>
+            <td style="font-weight: bold;">{{getTotalAmount() | number}} BDT</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <button (click)="addItem()" class="btn-add-item">+ Add Item</button>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button (click)="goBack()" class="btn btn-secondary">Back</button>
+      <button (click)="printForm()" class="btn btn-outline">Print</button>
+      <button (click)="submitPurchaseOrder()" class="btn btn-primary">Submit Purchase Order</button>
+    </div>
+  </div>
+</div>

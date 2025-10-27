@@ -1,0 +1,265 @@
+.purchase-order-container {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.purchase-order-form {
+  width: 80%;
+  background: white;
+  padding: 30px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.header-section {
+  text-align: center;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #333;
+  padding-bottom: 15px;
+
+  h1 {
+    color: #2c3e50;
+    margin: 0;
+    font-size: 28px;
+  }
+}
+
+.main-content {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 30px;
+}
+
+.left-section,
+.right-section {
+  flex: 1;
+}
+
+.form-group {
+  margin-bottom: 20px;
+
+  label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #2c3e50;
+  }
+
+  .value {
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+  }
+
+  .form-input,
+  .form-select,
+  .form-textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+
+    &:focus {
+      outline: none;
+      border-color: #007bff;
+    }
+  }
+
+  .form-textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+}
+
+.letter-content {
+  margin-top: 30px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  border-left: 4px solid #007bff;
+
+  p {
+    margin: 10px 0;
+    line-height: 1.5;
+  }
+}
+
+.items-section {
+  margin: 30px 0;
+}
+
+.items-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 15px;
+
+  th,
+  td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #2c3e50;
+    color: white;
+    font-weight: bold;
+  }
+
+  .table-input {
+    width: 100%;
+    border: none;
+    padding: 4px;
+    background: transparent;
+
+    &:focus {
+      outline: none;
+      background: #f0f8ff;
+    }
+
+    &.readonly {
+      background: #f8f9fa;
+      color: #6c757d;
+    }
+  }
+}
+
+.btn-remove {
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+  font-weight: bold;
+
+  &:hover {
+    background: #c82333;
+  }
+}
+
+.btn-add-item {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+
+  &:hover {
+    background: #218838;
+  }
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #ddd;
+
+  .btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+
+    &-secondary {
+      background: #6c757d;
+      color: white;
+
+      &:hover {
+        background: #545b62;
+      }
+    }
+
+    &-outline {
+      background: transparent;
+      color: #007bff;
+      border: 2px solid #007bff;
+
+      &:hover {
+        background: #007bff;
+        color: white;
+      }
+    }
+
+    &-primary {
+      background: #007bff;
+      color: white;
+
+      &:hover {
+        background: #0056b3;
+      }
+    }
+  }
+}
+
+// Print Styles
+@media print {
+  .purchase-order-container {
+    padding: 0;
+    background: white;
+  }
+
+  .purchase-order-form {
+    width: 100%;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .action-buttons,
+  .btn-remove,
+  .btn-add-item {
+    display: none !important;
+  }
+}
+
+// Responsive Design
+@media (max-width: 1024px) {
+  .purchase-order-form {
+    width: 95%;
+  }
+
+  .main-content {
+    flex-direction: column;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .purchase-order-container {
+    padding: 10px;
+  }
+
+  .purchase-order-form {
+    padding: 15px;
+  }
+
+  .items-table {
+    font-size: 12px;
+
+    th,
+    td {
+      padding: 4px;
+    }
+  }
+}

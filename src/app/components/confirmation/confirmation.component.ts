@@ -12,15 +12,19 @@ import { CommonModule } from '@angular/common';
         <!-- Success Message -->
         <div class="success-section">
           <div class="success-card">
-            <div class="success-icon">🎉</div>
-            <h1 class="success-title">Registration Successful!</h1>
+            <!-- <div class="success-icon">🎉</div> -->
+            <h1 class="success-title">Welcome To Credence Housing Limited!</h1>
             <p class="success-message">
-              Congratulations! Your account has been created successfully. 
-              Welcome to our professional community.
+             Credence Housing Limited is concerned about the functional and aesthetic needs of buyers and investors. Consequently, it aims to satisfy them by providing the highest standards of professionalism, ethics.
             </p>
-            <button class="btn btn-primary" (click)="goToDashboard()">
-              Go to Dashboard
-            </button>
+            
+              <button class="btn btn-primary" (click)="goToDashboard()">
+                Go to Dashboard
+              </button>
+              <button class="btn btn-purchase" (click)="openPurchaseOrderForm()">
+                Purchase Order Form
+              </button>
+            
           </div>
         </div>
 
@@ -140,6 +144,9 @@ import { CommonModule } from '@angular/common';
           <button class="btn btn-outline" (click)="downloadProfile()">
             Download Profile
           </button>
+          <button class="btn btn-purchase" (click)="openPurchaseOrderForm()">
+            Purchase Order Form
+          </button>
         </div>
       </div>
     </div>
@@ -202,5 +209,9 @@ export class ConfirmationComponent implements OnInit {
 
   downloadProfile() {
     alert('Profile download feature coming soon!');
+  }
+
+  openPurchaseOrderForm() {
+    this.router.navigate(['/purchase-order']);
   }
 }

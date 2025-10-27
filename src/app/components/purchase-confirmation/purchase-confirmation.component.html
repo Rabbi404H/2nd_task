@@ -1,0 +1,167 @@
+<div class="purchase-confirmation-container">
+  <div class="confirmation-content">
+    <!-- Header -->
+    <div class="header-section">
+      <h1>Purchase Order Confirmation</h1>
+      <p>POR25-10-00004 | AKIJ PLASTICS LTD</p>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Left Side - Items Table -->
+      <div class="items-section">
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th>S.L</th>
+              <th>MRF No.</th>
+              <th>Materials Name</th>
+              <th>Specification</th>
+              <th>MPR No</th>
+              <th>Unit</th>
+              <th>Qty</th>
+              <th>Rate</th>
+              <th>Disc %</th>
+              <th>Rate (Aflsr Dis)</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of items">
+              <td>{{item.sl}}</td>
+              <td>{{item.mrfNo}}</td>
+              <td>{{item.materialsName}}</td>
+              <td>{{item.specification}}</td>
+              <td>{{item.mprNo}}</td>
+              <td>{{item.unit}}</td>
+              <td>{{item.qty | number:'1.2-2'}}</td>
+              <td>{{item.rate | number:'1.2-2'}}</td>
+              <td>{{item.disc | number:'1.2-2'}}</td>
+              <td>{{item.rateAfterDisc | number:'1.2-2'}}</td>
+              <td>{{item.amount | number:'1.2-2'}}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="total-row">
+              <td colspan="10" style="text-align: right; font-weight: bold;">Sub Total</td>
+              <td style="font-weight: bold;">{{subtotal | number:'1.2-2'}}</td>
+            </tr>
+            <tr class="total-row">
+              <td colspan="10" style="text-align: right; font-weight: bold;">Total Amount</td>
+              <td style="font-weight: bold;">{{totalAmount | number:'1.2-2'}}</td>
+            </tr>
+            <tr>
+              <td colspan="11" class="amount-in-words">
+                In Word: ("Taka Forty Two Thousand Forty One Only")
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <!-- Right Side - Details -->
+      <div class="details-section">
+        <!-- Supply Details -->
+        <div class="detail-card">
+          <h4>Supply Details:</h4>
+          <p>CS Date-11/08/25</p>
+        </div>
+
+        <!-- Terms & Conditions -->
+        <div class="detail-card">
+          <h4>Terms & Conditions:</h4>
+          <ol>
+            <li>Delivery Place AI Project Site</li>
+            <li>Delivery Date 8-Oct-2025</li>
+            <li>Payment: Payment shall be made by ale payee cherue eher days of receipt of all materials in good conditions.</li>
+            <li>Carrying Upto Site</li>
+            <li>Condition Plesce send all bill in duplicate.</li>
+            <li>Measurement:</li>
+            <li>Flat No:</li>
+            <li>Flat Owner:</li>
+            <li>Others:</li>
+            <li>Contact Person: Md. Naiem Molla, 01897644077</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- Workflow Steps -->
+    <div class="workflow-section">
+      <h3>Approval Workflow</h3>
+      <div class="workflow-steps">
+        <div *ngFor="let step of workflowSteps" 
+             class="workflow-step"
+             [class.approved]="step.approved"
+             [class.active]="step.active"
+             [class.pending]="!step.approved && !step.active"
+             (click)="openStep(step)">
+          <div class="step-header">
+            <span class="step-number">{{step.id}}</span>
+            <h4 class="step-title">{{step.title}}</h4>
+            <span class="step-status" *ngIf="step.approved">✓ Approved</span>
+            <span class="step-status" *ngIf="!step.approved && step.active">Pending</span>
+            <span class="step-status" *ngIf="!step.approved && !step.active">Waiting</span>
+          </div>
+          <div class="step-details">
+            <p class="officer">{{step.officer}}</p>
+            <p class="date">{{step.date}}</p>
+            <button class="btn-approve" *ngIf="step.active && !step.approved" 
+                    (click)="$event.stopPropagation(); openStep(step)">
+              Approve
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Purchase Confirm Section - Show when all steps are approved -->
+    <div class="purchase-confirm-section" *ngIf="areAllStepsApproved()">
+      <div class="confirm-card">
+        <h3>Purchase Confirm</h3>
+        <p>All approvals have been completed. The purchase order is now confirmed.</p>
+        <button class="btn-confirm" (click)="confirmPurchase()">
+          Confirm Purchase
+        </button>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="btn btn-secondary" (click)="goBackToOrder()">
+        Back to Order
+      </button>
+      <button class="btn btn-outline" (click)="printPage()">
+        Print
+      </button>
+      <!-- Show Final Confirm button only when all steps are approved -->
+      <button class="btn btn-primary" *ngIf="areAllStepsApproved()" (click)="confirmPurchase()">
+        Final Confirm
+      </button>
+    </div>
+  </div>
+
+  <!-- Comment Modal -->
+  <div class="modal-overlay" *ngIf="showCommentModal" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{selectedStep?.title}}</h3>
+        <button class="close-btn" (click)="closeModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="officer-info">
+          <p><strong>Officer:</strong> {{selectedStep?.officer}}</p>
+        </div>
+        <div class="form-group">
+          <label>Comment:</label>
+          <textarea [(ngModel)]="commentText" rows="4" placeholder="Enter your comment..."></textarea>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+        <button class="btn btn-danger" (click)="rejectStep()">Reject</button>
+        <button class="btn btn-primary" (click)="approveStep()">Approve</button>
+      </div>
+    </div>
+  </div>
+</div>
