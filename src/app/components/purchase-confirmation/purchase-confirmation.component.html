@@ -6,112 +6,210 @@
       <p>POR25-10-00004 | AKIJ PLASTICS LTD</p>
     </div>
 
-    <!-- Main Content -->
-    <div class="main-content">
-      <!-- Left Side - Items Table -->
-      <div class="items-section">
-        <table class="items-table">
-          <thead>
-            <tr>
-              <th>S.L</th>
-              <th>MRF No.</th>
-              <th>Materials Name</th>
-              <th>Specification</th>
-              <th>MPR No</th>
-              <th>Unit</th>
-              <th>Qty</th>
-              <th>Rate</th>
-              <th>Disc %</th>
-              <th>Rate (Aflsr Dis)</th>
-              <th>Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of items">
-              <td>{{item.sl}}</td>
-              <td>{{item.mrfNo}}</td>
-              <td>{{item.materialsName}}</td>
-              <td>{{item.specification}}</td>
-              <td>{{item.mprNo}}</td>
-              <td>{{item.unit}}</td>
-              <td>{{item.qty | number:'1.2-2'}}</td>
-              <td>{{item.rate | number:'1.2-2'}}</td>
-              <td>{{item.disc | number:'1.2-2'}}</td>
-              <td>{{item.rateAfterDisc | number:'1.2-2'}}</td>
-              <td>{{item.amount | number:'1.2-2'}}</td>
-            </tr>
-          </tbody>
-          <tfoot>
-            <tr class="total-row">
-              <td colspan="10" style="text-align: right; font-weight: bold;">Sub Total</td>
-              <td style="font-weight: bold;">{{subtotal | number:'1.2-2'}}</td>
-            </tr>
-            <tr class="total-row">
-              <td colspan="10" style="text-align: right; font-weight: bold;">Total Amount</td>
-              <td style="font-weight: bold;">{{totalAmount | number:'1.2-2'}}</td>
-            </tr>
-            <tr>
-              <td colspan="11" class="amount-in-words">
-                In Word: ("Taka Forty Two Thousand Forty One Only")
-              </td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-
-      <!-- Right Side - Details -->
-      <div class="details-section">
-        <!-- Supply Details -->
-        <div class="detail-card">
-          <h4>Supply Details:</h4>
-          <p>CS Date-11/08/25</p>
+    <!-- Search and Filter Section -->
+    <div class="filter-section">
+      <div class="filter-grid">
+        <!-- Search -->
+        <div class="filter-group">
+          <label>Search:</label>
+          <input type="text" 
+                 [(ngModel)]="searchText" 
+                 (input)="onSearch()"
+                 placeholder="Search across all columns...">
         </div>
 
-        <!-- Terms & Conditions -->
-        <div class="detail-card">
-          <h4>Terms & Conditions:</h4>
-          <ol>
-            <li>Delivery Place AI Project Site</li>
-            <li>Delivery Date 8-Oct-2025</li>
-            <li>Payment: Payment shall be made by ale payee cherue eher days of receipt of all materials in good conditions.</li>
-            <li>Carrying Upto Site</li>
-            <li>Condition Plesce send all bill in duplicate.</li>
-            <li>Measurement:</li>
-            <li>Flat No:</li>
-            <li>Flat Owner:</li>
-            <li>Others:</li>
-            <li>Contact Person: Md. Naiem Molla, 01897644077</li>
-          </ol>
+        <!-- Unit Filter -->
+        <div class="filter-group">
+          <label>Unit:</label>
+          <select [(ngModel)]="selectedUnit" (change)="applyFilters()">
+            <option value="">All Units</option>
+            <option *ngFor="let unit of units" [value]="unit">{{unit}}</option>
+          </select>
+        </div>
+
+        <!-- Material Filter -->
+        <div class="filter-group">
+          <label>Material:</label>
+          <select [(ngModel)]="selectedMaterial" (change)="applyFilters()">
+            <option value="">All Materials</option>
+            <option *ngFor="let material of materials" [value]="material">{{material}}</option>
+          </select>
+        </div>
+
+        <!-- Sort Dropdown -->
+        <div class="filter-group sort-dropdown">
+          <label>Sort By:</label>
+          <div class="dropdown-container">
+            <button class="dropdown-toggle" (click)="toggleSortDropdown()">
+              {{sortField || 'Select Field'}} {{sortField ? getSortIcon(sortField) : ''}}
+            </button>
+            <div class="dropdown-menu" [class.show]="showSortDropdown">
+              <button (click)="sortTable('sl')">SL {{getSortIcon('sl')}}</button>
+              <button (click)="sortTable('mrfNo')">MRF No {{getSortIcon('mrfNo')}}</button>
+              <button (click)="sortTable('materialsName')">Materials {{getSortIcon('materialsName')}}</button>
+              <button (click)="sortTable('unit')">Unit {{getSortIcon('unit')}}</button>
+              <button (click)="sortTable('qty')">Qty {{getSortIcon('qty')}}</button>
+              <button (click)="sortTable('amount')">Amount {{getSortIcon('amount')}}</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Clear Filters -->
+        <div class="filter-group">
+          <button class="btn-clear" (click)="clearFilters()">Clear All</button>
         </div>
       </div>
     </div>
 
-    <!-- Workflow Steps -->
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Items Table -->
+      <div class="items-section">
+        <div class="table-container">
+          <table class="items-table">
+            <thead>
+              <tr>
+                <th (click)="sortTable('sl')" class="sortable">SL {{getSortIcon('sl')}}</th>
+                <th (click)="sortTable('mrfNo')" class="sortable">MRF No {{getSortIcon('mrfNo')}}</th>
+                <th (click)="sortTable('materialsName')" class="sortable">Materials Name {{getSortIcon('materialsName')}}</th>
+                <th>Specification</th>
+                <th>MPR No</th>
+                <th (click)="sortTable('unit')" class="sortable">Unit {{getSortIcon('unit')}}</th>
+                <th (click)="sortTable('qty')" class="sortable">Qty {{getSortIcon('qty')}}</th>
+                <th>Rate</th>
+                <th>Disc %</th>
+                <th>Rate (After Dis)</th>
+                <th (click)="sortTable('amount')" class="sortable">Amount {{getSortIcon('amount')}}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of paginatedItems">
+                <td>{{item.sl}}</td>
+                <td>{{item.mrfNo}}</td>
+                <td>{{item.materialsName}}</td>
+                <td>{{item.specification}}</td>
+                <td>{{item.mprNo}}</td>
+                <td>{{item.unit}}</td>
+                <td class="text-right">{{item.qty | number:'1.2-2'}}</td>
+                <td class="text-right">{{item.rate | number:'1.2-2'}}</td>
+                <td class="text-right">{{item.disc | number:'1.2-2'}}</td>
+                <td class="text-right">{{item.rateAfterDisc | number:'1.2-2'}}</td>
+                <td class="text-right">{{item.amount | number:'1.2-2'}}</td>
+              </tr>
+              <tr *ngIf="paginatedItems.length === 0">
+                <td colspan="11" class="no-data">No items found matching your filters.</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="total-row">
+                <td colspan="10" class="text-right">Sub Total</td>
+                <td class="text-right">{{subtotal | number:'1.2-2'}}</td>
+              </tr>
+              <tr class="total-row">
+                <td colspan="10" class="text-right">Total Amount</td>
+                <td class="text-right">{{totalAmount | number:'1.2-2'}}</td>
+              </tr>
+              <tr>
+                <td colspan="11" class="amount-in-words">
+                  In Word: ("Taka Forty Two Thousand Forty One Only")
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" *ngIf="totalPages > 1">
+          <button (click)="prevPage()" [disabled]="currentPage === 1">← Previous</button>
+          
+          <div class="page-numbers">
+            <button *ngFor="let page of pageNumbers" 
+                    (click)="goToPage(page)"
+                    [class.active]="page === currentPage">
+              {{page}}
+            </button>
+          </div>
+          
+          <button (click)="nextPage()" [disabled]="currentPage === totalPages">Next →</button>
+          
+          <span class="page-info">
+            Page {{currentPage}} of {{totalPages}} ({{items.length}} items)
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Approval Workflow Section -->
     <div class="workflow-section">
       <h3>Approval Workflow</h3>
+      
+      <!-- Workflow Status Summary -->
+      <div class="workflow-status">
+        <div class="status-summary">
+          <span class="status-item approved">Approved: {{getApprovedCount()}}</span>
+          <span class="status-item pending">Pending: {{getPendingCount()}}</span>
+          <span class="status-item rejected">Rejected: {{getRejectedCount()}}</span>
+          <span class="status-item waiting">Waiting: {{getWaitingCount()}}</span>
+        </div>
+      </div>
+
       <div class="workflow-steps">
         <div *ngFor="let step of workflowSteps" 
              class="workflow-step"
              [class.approved]="step.approved"
+             [class.rejected]="step.rejected"
              [class.active]="step.active"
-             [class.pending]="!step.approved && !step.active"
+             [class.waiting]="step.status === 'waiting'"
              (click)="openStep(step)">
+          
+          <!-- Step Signal -->
+          <div class="step-signal" [class]="getStepSignal(step)">
+            {{getStepSignalText(step)}}
+          </div>
+
           <div class="step-header">
             <span class="step-number">{{step.id}}</span>
             <h4 class="step-title">{{step.title}}</h4>
-            <span class="step-status" *ngIf="step.approved">✓ Approved</span>
-            <span class="step-status" *ngIf="!step.approved && step.active">Pending</span>
-            <span class="step-status" *ngIf="!step.approved && !step.active">Waiting</span>
+            <span class="step-status" [class]="getStatusClass(step.status)">
+              {{getStatusLabel(step.status)}}
+            </span>
           </div>
+          
           <div class="step-details">
             <p class="officer">{{step.officer}}</p>
-            <p class="date">{{step.date}}</p>
-            <button class="btn-approve" *ngIf="step.active && !step.approved" 
-                    (click)="$event.stopPropagation(); openStep(step)">
-              Approve
-            </button>
+            <p class="date" *ngIf="step.date">{{step.date}}</p>
+            <p class="comment" *ngIf="step.comment">{{step.comment}}</p>
+            
+            <!-- Action Buttons -->
+            <div class="step-actions" *ngIf="step.active">
+              <button class="btn-approve" 
+                      (click)="$event.stopPropagation(); openStep(step)">
+                Review & Approve
+              </button>
+            </div>
+
+            <!-- View Details Button for approved/rejected steps -->
+            <div class="step-actions" *ngIf="step.approved || step.rejected">
+              <button class="btn-view" 
+                      (click)="$event.stopPropagation(); openStep(step)">
+                View Details
+              </button>
+            </div>
           </div>
         </div>
+      </div>
+
+      <!-- Workflow Instructions -->
+      <div class="workflow-instructions">
+        <h4>Instructions:</h4>
+        <ul>
+          <li>✅ <strong>Green Signal:</strong> Step has been approved</li>
+          <li>❌ <strong>Red Signal:</strong> Step has been rejected</li>
+          <li>🟠 <strong>Orange Signal:</strong> Step is pending approval</li>
+          <li>⚪ <strong>Gray Signal:</strong> Step is waiting for previous approval</li>
+          <li>Steps must be approved in sequential order</li>
+          <li>If a step is rejected, all following steps will be reset</li>
+        </ul>
       </div>
     </div>
 
@@ -145,22 +243,51 @@
   <div class="modal-overlay" *ngIf="showCommentModal" (click)="closeModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h3>{{selectedStep?.title}}</h3>
+        <h3>{{selectedStep?.title}} - Review</h3>
         <button class="close-btn" (click)="closeModal()">×</button>
       </div>
       <div class="modal-body">
         <div class="officer-info">
           <p><strong>Officer:</strong> {{selectedStep?.officer}}</p>
+          <p><strong>Current Status:</strong> 
+            <span [class]="getStatusClass(selectedStep?.status)">
+              {{getStatusLabel(selectedStep?.status)}}
+            </span>
+          </p>
         </div>
+        
         <div class="form-group">
-          <label>Comment:</label>
-          <textarea [(ngModel)]="commentText" rows="4" placeholder="Enter your comment..."></textarea>
+          <label>Comments (Required):</label>
+          <textarea [(ngModel)]="commentText" 
+                    rows="4" 
+                    placeholder="Please provide your comments for approval or rejection..."
+                    required></textarea>
+          <small class="help-text">Comments are required for approval or rejection</small>
+        </div>
+
+        <div class="current-status" *ngIf="selectedStep?.approved || selectedStep?.rejected">
+          <h4>Current Decision:</h4>
+          <p *ngIf="selectedStep?.approved" class="status-approved">
+            ✅ Approved on {{selectedStep?.date}}
+          </p>
+          <p *ngIf="selectedStep?.rejected" class="status-rejected">
+            ❌ Rejected on {{selectedStep?.date}}
+          </p>
+          <p><strong>Comment:</strong> {{selectedStep?.comment}}</p>
         </div>
       </div>
       <div class="modal-actions">
         <button class="btn btn-secondary" (click)="closeModal()">Cancel</button>
-        <button class="btn btn-danger" (click)="rejectStep()">Reject</button>
-        <button class="btn btn-primary" (click)="approveStep()">Approve</button>
+        <button class="btn btn-danger" 
+                (click)="rejectStep()"
+                [disabled]="!commentText.trim()">
+          ❌ Reject
+        </button>
+        <button class="btn btn-primary" 
+                (click)="approveStep()"
+                [disabled]="!commentText.trim()">
+          ✅ Approve
+        </button>
       </div>
     </div>
   </div>
